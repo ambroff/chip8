@@ -8,15 +8,15 @@
 #include <array>
 #include <fstream>
 #include <iostream>
+#include <experimental/optional>
 
 namespace {
+    using std::experimental::optional;
+    using std::experimental::make_optional;
+
     const uint16_t REGISTER_COUNT{16};
     const uint16_t STACK_SIZE{16};
     const uint16_t MEMORY_SIZE{4096};
-
-    inline void not_implemented() {
-        std::cerr << __PRETTY_FUNCTION__ << ": Not implemented!" << std::endl;
-    }
 
     template<int RegisterCount, int StackSize, int MemorySize>
     struct CPU final {
@@ -29,8 +29,18 @@ namespace {
 
         std::array<bool, 64 * 32> fb;
 
-        uint8_t delayTimer;
-        uint8_t soundTimer;
+        uint8_t delayTimer{0};
+        uint8_t soundTimer{0};
+
+        void reset() {
+            std::fill(fb.begin(), fb.end(), false);
+            std::fill(stack.begin(), stack.end(), 0);
+            std::fill(memory.begin(), memory.end(), 0);
+            pc = 0x200;
+            I = 0;
+            delayTimer = 0;
+            soundTimer = 0;
+        }
     };
 
     typedef CPU<REGISTER_COUNT, STACK_SIZE, MEMORY_SIZE> cpu_t;
@@ -52,7 +62,7 @@ namespace {
         }
 
         virtual void execute(cpu_t &cpu) const override {
-            not_implemented();
+            throw std::exception{};
         }
 
     private:
@@ -280,6 +290,11 @@ namespace {
     class RestoreRegistersInstruction : public Instruction {
     };
 
+    inline optional<Instruction> decode_opcode(uint16_t opcode) {
+        return nullptr;
+    }
+}
+
     class Machine final {
     public:
         void reset() {
@@ -288,6 +303,16 @@ namespace {
         void loadProgram(std::ifstream &inputStream) {
 
         }
+
+        /**
+         * Execute one instruction.
+         */
+        void step() {
+
+        }
+
+    private:
+        cpu_t mCpu;
     };
 }
 
