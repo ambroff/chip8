@@ -8,12 +8,9 @@
 #include <array>
 #include <fstream>
 #include <iostream>
-#include <experimental/optional>
+#include <iterator>
 
 namespace {
-    using std::experimental::optional;
-    using std::experimental::make_optional;
-
     const uint16_t REGISTER_COUNT{16};
     const uint16_t STACK_SIZE{16};
     const uint16_t MEMORY_SIZE{4096};
@@ -40,6 +37,10 @@ namespace {
             I = 0;
             delayTimer = 0;
             soundTimer = 0;
+        }
+
+        void dumpState(std::ostream& outputStream) {
+
         }
     };
 
@@ -74,7 +75,7 @@ namespace {
      */
     class ClearScreenInstruction : public Instruction {
     public:
-        virtual void execute(cpu_t& cpu) const override {
+        void execute(cpu_t& cpu) const override {
             std::fill(cpu.fb.begin(), cpu.fb.end(), false);
         }
     };
@@ -290,10 +291,10 @@ namespace {
     class RestoreRegistersInstruction : public Instruction {
     };
 
-    inline optional<Instruction> decode_opcode(uint16_t opcode) {
-        return nullptr;
+    inline bool decode_opcode(uint16_t opcode, Instruction& result) {
+        result = ClearScreenInstruction{};
+        return false;
     }
-}
 
     class Machine final {
     public:
@@ -301,13 +302,20 @@ namespace {
         }
 
         void loadProgram(std::ifstream &inputStream) {
-
+            std::copy(
+                std::istream_iterator<uint8_t>(inputStream),
+                std::istream_iterator<uint8_t>(),
+                mCpu.memory.begin() + 0x200);
         }
 
         /**
          * Execute one instruction.
          */
         void step() {
+            //uint16_t nextOpCode{mCpu.memory[mCpu.pc] << 8 | mCpu.memory[mCpu.pc + 1]};
+            uint16_t opcode = *reinterpret_cast<uint16_t *>(mCpu.memory.data() + mCpu.pc);
+
+            std::cout << "OpCode: " << std::ios::hex << opcode << std::endl;
 
         }
 
@@ -317,6 +325,8 @@ namespace {
 }
 
 int main() {
+    const std::string program{"data/games/BREAKOUT"};
+
     // 64 x 32 pixel display
     // sprites are 8 pixels wide and 1-15 pixels tall
     const int GRAPHICS_SCALE_FACTOR{3};
@@ -325,8 +335,15 @@ int main() {
 
     std::cout << "Hello, World!" << std::endl;
 
-    ExecuteMachineSubroutineInstruction instruction{123};
-    instruction.execute(cpu);
+    std::ifstream inputStream;
+    inputStream.open(program, std::ios::binary);
+    if (!inputStream.is_open()) {
+        throw std::exception{};
+    }
+
+    Machine machine;
+    machine.loadProgram(inputStream);
+    machine.step();
 
     return 0;
 }
