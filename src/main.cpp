@@ -9,6 +9,8 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <cstring>
+#include <iomanip>
 
 namespace {
     const uint16_t REGISTER_COUNT{16};
@@ -40,7 +42,35 @@ namespace {
         }
 
         void dumpState(std::ostream& outputStream) {
+            outputStream << "PC:\t0x" << std::hex << pc << std::endl;
+            outputStream << "I:\t0x" << std::hex << I << std::endl;
+            outputStream << "delayTimer:\t" << std::dec << static_cast<int>(delayTimer) << std::endl;
+            outputStream << "soundTimer:\t" << std::dec << static_cast<int>(soundTimer) << std::endl;
+            outputStream << std::endl;
 
+            outputStream << "Stack:" << std::endl;
+            for (int i = 0; i < stack.size(); i++) {
+                outputStream << std::hex << std::setfill('0') << std::setw(2) << stack[i] << ' ';
+            }
+            outputStream << std::endl;
+
+            outputStream << std::endl << "Frame buffer:" << std::endl;
+            for (int i = 1; i <= fb.size(); i++) {
+                int pixel = fb[i-1] ? 1 : 0;
+                outputStream << pixel;
+                if (i % 64 == 0) {
+                    outputStream << std::endl;
+                }
+            }
+            outputStream << std::endl;
+
+            outputStream << "Main memory:" << std::endl;
+            for (int i = 1; i < memory.size(); i++) {
+                outputStream << std::hex << std::setfill('0') << std::setw(2)
+                             << static_cast<int>(memory[i - 1])
+                             << (i % 32 == 0 ? '\n' : ' ');
+            }
+            outputStream << std::endl;
         }
     };
 
@@ -299,9 +329,11 @@ namespace {
     class Machine final {
     public:
         void reset() {
+            mCpu.reset();
         }
 
         void loadProgram(std::ifstream &inputStream) {
+            reset();
             std::copy(
                 std::istream_iterator<uint8_t>(inputStream),
                 std::istream_iterator<uint8_t>(),
@@ -316,7 +348,10 @@ namespace {
             uint16_t opcode = *reinterpret_cast<uint16_t *>(mCpu.memory.data() + mCpu.pc);
 
             std::cout << "OpCode: " << std::ios::hex << opcode << std::endl;
+        }
 
+        void dumpCore(std::ostream& outputStream) {
+            mCpu.dumpState(outputStream);
         }
 
     private:
@@ -331,19 +366,18 @@ int main() {
     // sprites are 8 pixels wide and 1-15 pixels tall
     const int GRAPHICS_SCALE_FACTOR{3};
 
-    cpu_t cpu;
-
-    std::cout << "Hello, World!" << std::endl;
-
     std::ifstream inputStream;
     inputStream.open(program, std::ios::binary);
     if (!inputStream.is_open()) {
-        throw std::exception{};
+        std::cerr << "Unable to open file: " << std::strerror(errno) << std::endl;
+        return 1;
     }
 
     Machine machine;
     machine.loadProgram(inputStream);
     machine.step();
+
+    machine.dumpCore(std::cout);
 
     return 0;
 }
