@@ -49,7 +49,8 @@ namespace {
             outputStream << std::endl;
 
             for (int i = 0; i < RegisterCount; i++) {
-                outputStream << "V" << i << ": 0x" << std::hex << static_cast<int>(V[i]) << std::endl;
+                outputStream << "V" << std::dec << std::setfill('0') << std::setw(2) << i
+                             << ": 0x" << std::hex << static_cast<int>(V[i]) << std::endl;
             }
 
             outputStream << std::endl;
@@ -64,15 +65,15 @@ namespace {
             }
             outputStream << std::endl;
 
-            outputStream << std::endl << "Frame buffer:" << std::endl;
-            for (int i = 1; i <= fb.size(); i++) {
-                int pixel = fb[i-1] ? 1 : 0;
-                outputStream << pixel;
-                if (i % 64 == 0) {
-                    outputStream << std::endl;
-                }
-            }
-            outputStream << std::endl;
+//            outputStream << std::endl << "Frame buffer:" << std::endl;
+//            for (int i = 1; i <= fb.size(); i++) {
+//                int pixel = fb[i-1] ? 1 : 0;
+//                outputStream << pixel;
+//                if (i % 64 == 0) {
+//                    outputStream << std::endl;
+//                }
+//            }
+//            outputStream << std::endl;
 
 //            outputStream << "Main memory:" << std::endl;
 //            for (int i = 1; i < memory.size(); i++) {
@@ -88,7 +89,7 @@ namespace {
 
     class Instruction {
     public:
-        virtual ~Instruction() {}
+        virtual ~Instruction() = default;
 
         virtual void execute(cpu_t &cpu) const = 0;
     };
@@ -98,11 +99,11 @@ namespace {
      */
     class ExecuteMachineSubroutineInstruction : public Instruction {
     public:
-        ExecuteMachineSubroutineInstruction(uint16_t address)
+        explicit ExecuteMachineSubroutineInstruction(uint16_t address)
             : mAddress(address) {
         }
 
-        virtual void execute(cpu_t &cpu) const override {
+        void execute(cpu_t &cpu) const override {
             throw std::exception{};
         }
 
@@ -135,7 +136,7 @@ namespace {
      */
     class JumpInstruction : public Instruction {
     public:
-        JumpInstruction(const uint16_t address)
+        explicit JumpInstruction(const uint16_t address)
             : mTargetAddress(address)
         {
         }
@@ -365,15 +366,21 @@ namespace {
         if (opcode == 0x00E0) {
             result = new ClearScreenInstruction{};
             return true;
-        } else if (opcode == 0x00EE) {
+        }
+
+        if (opcode == 0x00EE) {
             result = new ReturnInstruction{};
             return true;
-        } else if (opcode & 0x1000) {
+        }
+
+        if ((opcode & 0x1000) != 0) {
             result = new JumpInstruction{static_cast<uint16_t>(opcode & static_cast<uint16_t>(4096))};
             return true;
-        } else if (opcode & 0x6000) {
-            uint8_t reg = static_cast<uint8_t>(opcode & (~4096 | ~3));
-            uint8_t value = static_cast<uint8_t>(opcode & (~4096 | ~4));
+        }
+
+        if ((opcode & 0xF000) == 0x6000) {
+            auto reg = static_cast<uint8_t>((opcode & 0x0F00) >> 8);
+            auto value = static_cast<uint8_t>(opcode & 0x00FF);
             result = new StoreInVxInstruction{reg, value};
             return true;
         }
@@ -429,7 +436,7 @@ int main() {
 
     // 64 x 32 pixel display
     // sprites are 8 pixels wide and 1-15 pixels tall
-    const int GRAPHICS_SCALE_FACTOR{3};
+    //const int GRAPHICS_SCALE_FACTOR{3};
 
     std::ifstream inputStream;
     inputStream.open(program, std::ios::binary);
