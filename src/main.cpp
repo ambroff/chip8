@@ -32,6 +32,7 @@ namespace {
         uint8_t soundTimer{0};
 
         void reset() {
+            std::fill(V.begin(), V.end(), 0);
             std::fill(fb.begin(), fb.end(), false);
             std::fill(stack.begin(), stack.end(), 0);
             std::fill(memory.begin(), memory.end(), 0);
@@ -44,6 +45,15 @@ namespace {
         void dumpState(std::ostream& outputStream) {
             outputStream << "PC:\t0x" << std::hex << pc << std::endl;
             outputStream << "I:\t0x" << std::hex << I << std::endl;
+
+            outputStream << std::endl;
+
+            for (int i = 0; i < RegisterCount; i++) {
+                outputStream << "V" << i << ": 0x" << std::hex << static_cast<int>(V[i]) << std::endl;
+            }
+
+            outputStream << std::endl;
+
             outputStream << "delayTimer:\t" << std::dec << static_cast<int>(delayTimer) << std::endl;
             outputStream << "soundTimer:\t" << std::dec << static_cast<int>(soundTimer) << std::endl;
             outputStream << std::endl;
@@ -64,13 +74,13 @@ namespace {
             }
             outputStream << std::endl;
 
-            outputStream << "Main memory:" << std::endl;
-            for (int i = 1; i < memory.size(); i++) {
-                outputStream << std::hex << std::setfill('0') << std::setw(2)
-                             << static_cast<int>(memory[i - 1])
-                             << (i % 32 == 0 ? '\n' : ' ');
-            }
-            outputStream << std::endl;
+//            outputStream << "Main memory:" << std::endl;
+//            for (int i = 1; i < memory.size(); i++) {
+//                outputStream << std::hex << std::setfill('0') << std::setw(2)
+//                             << static_cast<int>(memory[i - 1])
+//                             << (i % 32 == 0 ? '\n' : ' ');
+//            }
+//            outputStream << std::endl;
         }
     };
 
