@@ -358,10 +358,10 @@ namespace {
         } else if (opcode == 0x00EE) {
             result = new ReturnInstruction{};
             return true;
-        } else if ((opcode >> 3) == 1) {
+        } else if (opcode & 0x1000) {
             result = new JumpInstruction{static_cast<uint16_t>(opcode & static_cast<uint16_t>(4096))};
             return true;
-        } else if ((opcode >> 3) == 0x6) {
+        } else if (opcode & 0x6000) {
             uint8_t reg = static_cast<uint8_t>(opcode & (~4096 | ~3));
             uint8_t value = static_cast<uint8_t>(opcode & (~4096 | ~4));
             result = new StoreInVxInstruction{reg, value};
@@ -400,6 +400,9 @@ namespace {
             instruction->execute(mCpu);
 
             delete instruction;
+
+            // Each instruction is two bytes long, so we need to advance by two bytes.
+            mCpu.pc += 2;
         }
 
         void dumpCore(std::ostream& outputStream) {
