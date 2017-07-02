@@ -114,12 +114,28 @@ namespace {
      * 00EE	Return from a subroutine
      */
     class ReturnInstruction : public Instruction {
+    public:
+        void execute(cpu_t& cpu) const override {
+            cpu.pc = cpu.stack[cpu.I--];
+        }
     };
 
     /**
      * 1NNN	Jump to address NNN
      */
     class JumpInstruction : public Instruction {
+    public:
+        JumpInstruction(const uint16_t address)
+            : mTargetAddress(address)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.pc = mTargetAddress;
+        }
+
+    private:
+        uint16_t mTargetAddress;
     };
 
     /**
@@ -150,6 +166,20 @@ namespace {
      * 6XNN	Store number NN in register VX
      */
     class StoreInVxInstruction : public Instruction {
+    public:
+        StoreInVxInstruction(const uint8_t reg, const uint8_t value)
+            : mRegIdx(reg),
+              mValue(value)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.V[mRegIdx] = mValue;
+        }
+
+    private:
+        uint8_t mRegIdx;
+        uint8_t mValue;
     };
 
     /**
@@ -321,8 +351,23 @@ namespace {
     class RestoreRegistersInstruction : public Instruction {
     };
 
-    inline bool decode_opcode(uint16_t opcode, Instruction& result) {
-        result = ClearScreenInstruction{};
+    inline bool decode_opcode(uint16_t opcode, Instruction*& result) {
+        if (opcode == 0x00E0) {
+            result = new ClearScreenInstruction{};
+            return true;
+        } else if (opcode == 0x00EE) {
+            result = new ReturnInstruction{};
+            return true;
+        } else if ((opcode >> 3) == 1) {
+            result = new JumpInstruction{static_cast<uint16_t>(opcode & static_cast<uint16_t>(4096))};
+            return true;
+        } else if ((opcode >> 3) == 0x6) {
+            uint8_t reg = static_cast<uint8_t>(opcode & (~4096 | ~3));
+            uint8_t value = static_cast<uint8_t>(opcode & (~4096 | ~4));
+            result = new StoreInVxInstruction{reg, value};
+            return true;
+        }
+
         return false;
     }
 
@@ -344,10 +389,17 @@ namespace {
          * Execute one instruction.
          */
         void step() {
-            //uint16_t nextOpCode{mCpu.memory[mCpu.pc] << 8 | mCpu.memory[mCpu.pc + 1]};
-            uint16_t opcode = *reinterpret_cast<uint16_t *>(mCpu.memory.data() + mCpu.pc);
+            uint16_t opcode{mCpu.memory[mCpu.pc] << 8 | mCpu.memory[mCpu.pc + 1]};
 
-            std::cout << "OpCode: " << std::ios::hex << opcode << std::endl;
+            Instruction *instruction = nullptr;
+            if (!decode_opcode(opcode, instruction)) {
+                std::cerr << "Unable to decode instruction: " << std::hex << opcode << std::endl;
+                exit(1); // TODO: Use an exception here instead?
+            }
+
+            instruction->execute(mCpu);
+
+            delete instruction;
         }
 
         void dumpCore(std::ostream& outputStream) {
