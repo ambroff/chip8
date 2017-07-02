@@ -3,5 +3,18 @@ project(chip8)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SOURCE_FILES src/main.cpp src/instructions.cpp src/cpu.hpp)
+set(SOURCE_FILES src/main.cpp src/instructions.hpp src/cpu.hpp test/test_instructions.cpp)
 add_executable(chip8 ${SOURCE_FILES})
+
+enable_testing()
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+file(GLOB TEST_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} test/*.cpp)
+foreach(testSrc ${TEST_SRCS})
+  get_filename_component(testName ${testSrc} NAME_WE)
+  add_executable(${testName} ${testSrc})
+  target_include_directories(${testName}
+    PRIVATE ${BOOST_INCLUDE_DIRS}
+    PRIVATE ${CMAKE_SOURCE_DIR}/src)
+  target_link_libraries(${testName} ${Boost_LIBRARIES})
+  add_test(NAME ${testName} COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test/${testName})
+endforeach(testSrc)
