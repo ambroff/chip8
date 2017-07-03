@@ -71,24 +71,62 @@ namespace chip8 {
      * 2NNN	Execute subroutine starting at address NNN
      */
     class ExecuteSubroutineInstruction : public Instruction {
+    public:
+        ExecuteSubroutineInstruction(uint16_t targetAddress)
+            : mTargetAddress(targetAddress)
+        {
+        }
+
+    private:
+        uint16_t mTargetAddress;
     };
 
     /**
      * 3XNN	Skip the following instruction if the value of register VX equals NN
      */
     class SkipIfVxEqualsInstruction : public Instruction {
+    public:
+        SkipIfVxEqualsInstruction(uint8_t reg, uint8_t value)
+            : mRegister(reg),
+              mValue(value)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
+        uint8_t mValue;
     };
 
     /**
      * 4XNN	Skip the following instruction if the value of register VX is not equal to NN
      */
     class SkipIfVxNotEqualInstruction : public Instruction {
+    public:
+        SkipIfVxNotEqualInstruction(uint8_t reg, uint8_t value)
+            : mRegister(reg),
+              mValue(value)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
+        uint8_t mValue;
     };
 
     /**
      * 5XY0	Skip the following instruction if the value of register VX is equal to the value of register VY
      */
-    class SkipIfVxEqualVyInstruction : public Instruction {
+    class SkipIfVxEqualsVyInstruction : public Instruction {
+    public:
+        SkipIfVxEqualsVyInstruction(uint8_t reg_x, uint8_t reg_y)
+            : mRegisterX(reg_x),
+              mRegisterY(reg_y)
+        {
+        }
+
+    private:
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
@@ -135,6 +173,16 @@ namespace chip8 {
      * 8XY0	Store the value of register VY in register VX
      */
     class StoreVxInVyInstruction : public Instruction {
+    public:
+        StoreVxInVyInstruction(uint8_t reg_x, uint8_t reg_y)
+            : mRegisterX(reg_x),
+              mRegisterY(reg_y)
+        {
+        }
+
+    private:
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
@@ -203,6 +251,16 @@ namespace chip8 {
      * Set VF to 00 if a carry does not occur
      */
     class AddInstruction : public Instruction {
+    public:
+        AddInstruction(uint8_t reg_x, uint8_t reg_y)
+            : mRegisterX(reg_x),
+              mRegisterY(reg_y)
+        {
+        }
+
+    private:
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
@@ -248,30 +306,76 @@ namespace chip8 {
      * Set register VF to the most significant bit prior to the shift
      */
     class ShiftLeftInstruction : public Instruction {
+    public:
+        ShiftLeftInstruction(uint8_t reg_x, uint8_t reg_y)
+            : mRegisterX(reg_x),
+              mRegisterY(reg_y)
+        {
+        }
+
+    private:
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
      * 9XY0	Skip the following instruction if the value of register VX is not equal to the value of register VY
      */
-    class SkipIfVxNotEqualVyInstruction : public Instruction {
+    class SkipIfVxNotEqualsVyInstruction : public Instruction {
+    public:
+        SkipIfVxNotEqualsVyInstruction(uint8_t reg_x, uint8_t reg_y)
+            : mRegisterX(reg_x),
+              mRegisterY(reg_y)
+        {
+        }
+
+    private:
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
      * ANNN	Store memory address NNN in register I
      */
     class StoreAddressInstruction : public Instruction {
+    public:
+        StoreAddressInstruction(uint16_t address)
+            : mAddress(address)
+        {
+        }
+
+    private:
+        uint16_t mAddress;
     };
 
     /**
      * BNNN	Jump to address NNN + V0
      */
     class JumpToAddressInstruction : public Instruction {
+    public:
+        JumpToAddressInstruction(uint16_t target_address)
+            : mTargetAddress(target_address)
+        {
+        }
+
+    private:
+        uint16_t mTargetAddress;
     };
 
     /**
      * CXNN	Set VX to a random number with a mask of NN
      */
     class StoreRandomWithMaskInstruction : public Instruction {
+    public:
+        StoreRandomWithMaskInstruction(uint8_t reg, uint8_t value)
+            : mRegister(reg),
+              mValue(value)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
+        uint8_t mValue;
     };
 
     /**
@@ -279,6 +383,18 @@ namespace chip8 {
      * Set VF to 01 if any set pixels are changed to unset, and 00 otherwise
      */
     class DrawSpriteInstruction : public Instruction {
+    public:
+        DrawSpriteInstruction(uint8_t reg_x, uint8_t reg_y, uint8_t length)
+            : mRegisterX(reg_x),
+              mRegisterY(reg_y),
+              mLength(length)
+        {
+        }
+
+    private:
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
+        uint8_t mLength;
     };
 
     /**
@@ -286,6 +402,14 @@ namespace chip8 {
      * pressed
      */
     class SkipIfKeyPressedInstruction : public Instruction {
+    public:
+        SkipIfKeyPressedInstruction(uint8_t reg)
+            : mRegister(reg)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
@@ -293,6 +417,14 @@ namespace chip8 {
      * is not pressed
      */
     class SkipIfKeyNotPressedInstruction : public Instruction {
+    public:
+        SkipIfKeyNotPressedInstruction(uint8_t reg)
+            : mRegister(reg)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
@@ -316,6 +448,14 @@ namespace chip8 {
      * FX0A	Wait for a keypress and store the result in register VX
      */
     class WaitForKeypressInstruction : public Instruction {
+    public:
+        WaitForKeypressInstruction(uint8_t reg)
+            : mRegister(reg)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
@@ -339,24 +479,56 @@ namespace chip8 {
      * FX18	Set the sound timer to the value of register VX
      */
     class SetSoundTimerInstruction : public Instruction {
+    public:
+        SetSoundTimerInstruction(uint8_t reg)
+            : mRegister(reg)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
      * FX1E	Add the value stored in register VX to register I
      */
     class AddToIInstruction : public Instruction {
+    public:
+        AddToIInstruction(uint8_t reg)
+            :mRegister(reg)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
      * FX29	Set I to the memory address of the sprite data corresponding to the hexadecimal digit stored in register VX
      */
     class StoreInIInstruction : public Instruction {
+    public:
+        StoreInIInstruction(uint8_t reg)
+            : mRegister(reg)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
      * FX33	Store the binary-coded decimal equivalent of the value stored in register VX at addresses I, I+1, and I+2
      */
     class StoreDecimalInstruction : public Instruction {
+    public:
+        StoreDecimalInstruction(uint8_t reg)
+            : mRegister(reg)
+        {
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
@@ -364,6 +536,14 @@ namespace chip8 {
      * I is set to I + X + 1 after operation
      */
     class StoreRegistersInstruction : public Instruction {
+    public:
+        StoreRegistersInstruction(uint8_t up_to_register)
+            : mUpToRegister(up_to_register)
+        {
+        }
+
+    private:
+        uint8_t mUpToRegister;
     };
 
     /**
@@ -371,5 +551,13 @@ namespace chip8 {
      * I is set to I + X + 1 after operation
      */
     class RestoreRegistersInstruction : public Instruction {
+    public:
+        RestoreRegistersInstruction(uint8_t up_to_register)
+            : mUpToRegister(up_to_register)
+        {
+        }
+
+    private:
+        uint8_t mUpToRegister;
     };
 }
