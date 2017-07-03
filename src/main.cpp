@@ -58,7 +58,7 @@ namespace chip8 {
          * Execute one instruction.
          */
         void step() {
-            uint16_t opcode{mCpu.memory[mCpu.pc] << 8 | mCpu.memory[mCpu.pc + 1]};
+            uint16_t opcode{static_cast<uint16_t>(mCpu.memory[mCpu.pc] << 8 | mCpu.memory[mCpu.pc + 1])};
 
             Instruction *instruction = nullptr;
             if (!decode_opcode(opcode, instruction)) {
