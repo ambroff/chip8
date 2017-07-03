@@ -141,18 +141,60 @@ namespace chip8 {
      * 8XY1	Set VX to VX OR VY
      */
     class BitwiseOrInstruction : public Instruction {
+    public:
+        BitwiseOrInstruction(uint8_t x, uint8_t y)
+            : mXRegister(x),
+              mYRegister(y)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.V[mXRegister] = cpu.V[mXRegister] | cpu.V[mYRegister];
+        }
+
+    private:
+        uint8_t mXRegister;
+        uint8_t mYRegister;
     };
 
     /**
      * 8XY2	Set VX to VX AND VY
      */
     class BitwiseAndInstruction : public Instruction {
+    public:
+        BitwiseAndInstruction(uint8_t x, uint8_t y)
+            : mXRegister(x),
+              mYRegister(y)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.V[mXRegister] = cpu.V[mXRegister] & cpu.V[mYRegister];
+        }
+
+    private:
+        uint8_t mXRegister;
+        uint8_t mYRegister;
     };
 
     /**
      * 8XY3	Set VX to VX XOR VY
      */
     class BitwiseXorInstruction : public Instruction {
+    public:
+        BitwiseXorInstruction(uint8_t x, uint8_t y)
+            : mXRegister(x),
+              mYRegister(y)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.V[mXRegister] = cpu.V[mXRegister] ^ cpu.V[mYRegister];
+        }
+
+    private:
+        uint8_t mXRegister;
+        uint8_t mYRegister;
     };
 
     /**

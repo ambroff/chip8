@@ -98,4 +98,46 @@ BOOST_AUTO_TEST_CASE(clear_screen_instruction) {
     BOOST_CHECK_EQUAL(cpu.fb[12], false);
 }
 
+BOOST_AUTO_TEST_CASE(bitwise_and_instruction) {
+    chip8::cpu_t cpu;
+    cpu.reset();
+
+    cpu.V[5] = 0x7B;
+    cpu.V[2] = 0x0F;
+
+    chip8::BitwiseAndInstruction instruction{5, 2};
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[5], 0xB);
+    BOOST_CHECK_EQUAL(cpu.V[2], 0x0F);
+}
+
+BOOST_AUTO_TEST_CASE(bitwise_or_instruction) {
+    chip8::cpu_t cpu;
+    cpu.reset();
+
+    cpu.V[1] = 0xF0;
+    cpu.V[9] = 0x0F;
+
+    chip8::BitwiseOrInstruction instruction{1, 9};
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[1], 0xFF);
+    BOOST_CHECK_EQUAL(cpu.V[9], 0x0F);
+}
+
+BOOST_AUTO_TEST_CASE(bitwise_xor_instruction) {
+    chip8::cpu_t cpu;
+    cpu.reset();
+
+    cpu.V[1] = 0xF0;
+    cpu.V[9] = 0x0F;
+
+    chip8::BitwiseXorInstruction instruction{1, 9};
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[1], 0xFF);
+    BOOST_CHECK_EQUAL(cpu.V[9], 0x0F);
+}
+
 #pragma clang diagnostic pop
