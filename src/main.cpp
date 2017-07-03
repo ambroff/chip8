@@ -8,8 +8,6 @@
 #include <array>
 #include <fstream>
 #include <iostream>
-#include <iterator>
-#include <cstring>
 #include <iomanip>
 
 #include "cpu.hpp"
