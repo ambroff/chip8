@@ -54,7 +54,7 @@ namespace chip8 {
         }
 
         std::string toString() const override {
-            return "RTN";
+            return "RET";
         }
     };
 
@@ -181,6 +181,10 @@ namespace chip8 {
             cpu.V[mRegister] += mValue;
         }
 
+        std::string toString() const override {
+            return "INC V" + std::to_string(mRegister) + ", " + std::to_string(mValue);
+        }
+
     private:
         uint8_t mRegister;
         uint8_t mValue;
@@ -208,18 +212,22 @@ namespace chip8 {
     class BitwiseOrInstruction : public Instruction {
     public:
         BitwiseOrInstruction(uint8_t x, uint8_t y)
-            : mXRegister(x),
-              mYRegister(y)
+            : mRegisterX(x),
+              mRegisterY(y)
         {
         }
 
         void execute(cpu_t& cpu) const override {
-            cpu.V[mXRegister] = cpu.V[mXRegister] | cpu.V[mYRegister];
+            cpu.V[mRegisterX] = cpu.V[mRegisterX] | cpu.V[mRegisterY];
+        }
+
+        std::string toString() const override {
+            return "OR V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
         }
 
     private:
-        uint8_t mXRegister;
-        uint8_t mYRegister;
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
@@ -228,18 +236,22 @@ namespace chip8 {
     class BitwiseAndInstruction : public Instruction {
     public:
         BitwiseAndInstruction(uint8_t x, uint8_t y)
-            : mXRegister(x),
-              mYRegister(y)
+            : mRegisterX(x),
+              mRegisterY(y)
         {
         }
 
         void execute(cpu_t& cpu) const override {
-            cpu.V[mXRegister] = cpu.V[mXRegister] & cpu.V[mYRegister];
+            cpu.V[mRegisterX] = cpu.V[mRegisterX] & cpu.V[mRegisterY];
+        }
+
+        std::string toString() const override {
+            return "AND V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
         }
 
     private:
-        uint8_t mXRegister;
-        uint8_t mYRegister;
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
@@ -248,18 +260,22 @@ namespace chip8 {
     class BitwiseXorInstruction : public Instruction {
     public:
         BitwiseXorInstruction(uint8_t x, uint8_t y)
-            : mXRegister(x),
-              mYRegister(y)
+            : mRegisterX(x),
+              mRegisterY(y)
         {
         }
 
         void execute(cpu_t& cpu) const override {
-            cpu.V[mXRegister] = cpu.V[mXRegister] ^ cpu.V[mYRegister];
+            cpu.V[mRegisterX] = cpu.V[mRegisterX] ^ cpu.V[mRegisterY];
+        }
+
+        std::string toString() const override {
+            return "XOR V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
         }
 
     private:
-        uint8_t mXRegister;
-        uint8_t mYRegister;
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
@@ -303,19 +319,23 @@ namespace chip8 {
     class SubtractInstruction : public Instruction {
     public:
         SubtractInstruction(uint8_t x, uint8_t y)
-            : mXRegister(x),
-              mYRegister(y)
+            : mRegisterX(x),
+              mRegisterY(y)
         {
         }
 
         void execute(cpu_t& cpu) const override {
-            cpu.V[mXRegister] = cpu.V[mYRegister] - cpu.V[mXRegister];
+            cpu.V[mRegisterX] = cpu.V[mRegisterY] - cpu.V[mRegisterX];
             cpu.V[15] = 1; // TODO: Set to 0 if borrow occurs
         }
 
+        std::string toString() const override {
+            return "SUB V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
+        }
+
     private:
-        uint8_t mXRegister;
-        uint8_t mYRegister;
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
@@ -457,6 +477,10 @@ namespace chip8 {
             cpu.V[mRegister] = cpu.delayTimer;
         }
 
+        std::string toString() const override {
+            return "MOVED V" + std::to_string(mRegister);
+        }
+
     private:
         uint8_t mRegister;
     };
@@ -486,6 +510,10 @@ namespace chip8 {
 
         void execute(cpu_t& cpu) const override {
             cpu.delayTimer = cpu.V[mRegister];
+        }
+
+        std::string toString() const override {
+            return "LOADD V" + std::to_string(mRegister);
         }
 
     private:
