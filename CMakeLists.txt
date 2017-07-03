@@ -3,6 +3,10 @@ project(chip8)
 
 set(CMAKE_CXX_STANDARD 14)
 
+set(DISASSEMBLER_SOURCE_FILES disassembler/disassembler.cpp)
+add_executable(disassembler ${DISASSEMBLER_SOURCE_FILES})
+target_include_directories(disassembler PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
 set(SOURCE_FILES
   src/main.cpp
   src/instructions.hpp
