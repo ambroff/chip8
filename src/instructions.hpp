@@ -3,11 +3,14 @@
 #include "cpu.hpp"
 
 namespace chip8 {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "ClangTidyInspection"
     class Instruction {
     public:
         virtual ~Instruction() = default;
         virtual void execute(cpu_t &cpu) const = 0;
     };
+#pragma clang diagnostic pop
 
     /**
      * 0NNN	Execute machine language subroutine at address NNN
@@ -112,6 +115,20 @@ namespace chip8 {
      * 7XNN	Add the value NN to register VX
      */
     class IncrementInstruction : public Instruction {
+    public:
+        IncrementInstruction(uint8_t reg, uint8_t value)
+            : mRegister(reg),
+              mValue(value)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.V[mRegister] += mValue;
+        }
+
+    private:
+        uint8_t mRegister;
+        uint8_t mValue;
     };
 
     /**
@@ -167,6 +184,21 @@ namespace chip8 {
      * Set VF to 01 if a borrow does not occur
      */
     class SubtractInstruction : public Instruction {
+    public:
+        SubtractInstruction(uint8_t x, uint8_t y)
+            : mXRegister(x),
+              mYRegister(y)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.V[mXRegister] = cpu.V[mYRegister] - cpu.V[mXRegister];
+            cpu.V[15] = 1; // TODO: Set to 0 if borrow occurs
+        }
+
+    private:
+        uint8_t mXRegister;
+        uint8_t mYRegister;
     };
 
     /**
@@ -224,7 +256,18 @@ namespace chip8 {
     /**
      * FX07	Store the current value of the delay timer in register VX
      */
-    class SetTimerInstruction : public Instruction {
+    class StoreDelayTimerInstruction : public Instruction {
+    public:
+        StoreDelayTimerInstruction(uint8_t reg) : mRegister(reg)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.V[mRegister] = cpu.delayTimer;
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
@@ -236,7 +279,18 @@ namespace chip8 {
     /**
      * FX15	Set the delay timer to the value of register VX
      */
-    class SetDelayTimerInstruction : public Instruction {
+    class LoadDelayTimerInstruction : public Instruction {
+    public:
+        LoadDelayTimerInstruction(uint8_t reg) : mRegister(reg)
+        {
+        }
+
+        void execute(cpu_t& cpu) const override {
+            cpu.delayTimer = cpu.V[mRegister];
+        }
+
+    private:
+        uint8_t mRegister;
     };
 
     /**
