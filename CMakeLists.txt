@@ -9,6 +9,7 @@ target_include_directories(disassembler PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 set(SOURCE_FILES
   src/main.cpp
+  src/decode.hpp
   src/instructions.hpp
   src/cpu.hpp
   )

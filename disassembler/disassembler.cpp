@@ -3,6 +3,8 @@
 #include <libgen.h>
 #include <iomanip>
 
+#include "decode.hpp"
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {
@@ -49,6 +51,14 @@ int main(int argc, char **argv)
                 break;
         }
 
-        std::cout << std::hex<< std::setw(2) << std::setfill('0') << "0x" << opcode << std::dec << "|" << std::endl;
+        std::unique_ptr<chip8::Instruction> instruction = chip8::decode_opcode(opcode);
+        if (!instruction) {
+            std::cerr << "Unknown opcode: " << opcode << std::endl;
+            return 1;
+        }
+
+        std::cout << std::hex<< std::setw(2) << std::setfill('0') << "0x" << opcode << std::dec << "|\t\t"
+                  << instruction->toString()
+                  << std::endl;
     }
 }

@@ -9,6 +9,7 @@ namespace chip8 {
     public:
         virtual ~Instruction() = default;
         virtual void execute(cpu_t &cpu) const = 0;
+        virtual std::string toString() const = 0;
     };
 #pragma clang diagnostic pop
 
@@ -37,6 +38,10 @@ namespace chip8 {
         void execute(cpu_t& cpu) const override {
             std::fill(cpu.fb.begin(), cpu.fb.end(), false);
         }
+
+        std::string toString() const override {
+            return "CLS";
+        }
     };
 
     /**
@@ -46,6 +51,10 @@ namespace chip8 {
     public:
         void execute(cpu_t& cpu) const override {
             cpu.pc = cpu.stack[cpu.I--];
+        }
+
+        std::string toString() const override {
+            return "RTN";
         }
     };
 
@@ -61,6 +70,10 @@ namespace chip8 {
 
         void execute(cpu_t& cpu) const override {
             cpu.pc = mTargetAddress;
+        }
+
+        std::string toString() const override {
+            return "JMP " + std::to_string(mTargetAddress);
         }
 
     private:
@@ -142,6 +155,10 @@ namespace chip8 {
 
         void execute(cpu_t& cpu) const override {
             cpu.V[mRegIdx] = mValue;
+        }
+
+        std::string toString() const override {
+            return "MOV V" + std::to_string(mRegIdx) + ", " + std::to_string(mValue);
         }
 
     private:

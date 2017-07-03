@@ -11,35 +11,10 @@
 #include <iomanip>
 
 #include "cpu.hpp"
+#include "decode.hpp"
 #include "instructions.hpp"
 
 namespace chip8 {
-    inline bool decode_opcode(uint16_t opcode, Instruction*& result) {
-        if (opcode == 0x00E0) {
-            result = new ClearScreenInstruction{};
-            return true;
-        }
-
-        if (opcode == 0x00EE) {
-            result = new ReturnInstruction{};
-            return true;
-        }
-
-        if ((opcode & 0x1000) != 0) {
-            result = new JumpInstruction{static_cast<uint16_t>(opcode & static_cast<uint16_t>(4096))};
-            return true;
-        }
-
-        if ((opcode & 0xF000) == 0x6000) {
-            auto reg = static_cast<uint8_t>((opcode & 0x0F00) >> 8);
-            auto value = static_cast<uint8_t>(opcode & 0x00FF);
-            result = new StoreInVxInstruction{reg, value};
-            return true;
-        }
-
-        return false;
-    }
-
     class Machine final {
     public:
         void reset() {
@@ -58,17 +33,18 @@ namespace chip8 {
          * Execute one instruction.
          */
         void step() {
+            // Read the next opcode from main memory
             uint16_t opcode{static_cast<uint16_t>(mCpu.memory[mCpu.pc] << 8 | mCpu.memory[mCpu.pc + 1])};
 
-            Instruction *instruction = nullptr;
-            if (!decode_opcode(opcode, instruction)) {
+            // Decode the instruction
+            std::unique_ptr<Instruction> instruction = decode_opcode(opcode);
+            if (!instruction) {
                 std::cerr << "Unable to decode instruction: " << std::hex << opcode << std::endl;
                 exit(1); // TODO: Use an exception here instead?
             }
 
+            // Actually execute the instruction
             instruction->execute(mCpu);
-
-            delete instruction;
 
             // Each instruction is two bytes long, so we need to advance by two bytes.
             mCpu.pc += 2;
