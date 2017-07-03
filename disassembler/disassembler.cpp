@@ -17,9 +17,10 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    std::cout << "\t\tstart:" << std::endl;
+
     char next[2];
     while (!image_file.eof()) {
-        //image_file.read(reinterpret_cast<char *>(&opcode), sizeof(uint16_t));
         image_file.read(next, 2);
 
         if (image_file.fail()) {
@@ -33,13 +34,21 @@ int main(int argc, char **argv)
 
         uint16_t opcode{static_cast<uint16_t>(next[0] << 8 | next[1])};
 
+        int address{static_cast<int>(image_file.tellg()) + 0x200 - 2};
+
         switch ((opcode & 0xF000) >> 12) {
             case 1:
+                std::cout << "\t" << "addr_" << std::dec << address << std::dec << std::endl;
                 break;
+
             case 2:
+                std::cout << "\t" << "sub_" << std::dec << address << std::dec << std::endl;
+                break;
+
+            default:
+                break;
         }
 
-        std::cout << "OpCode: " << std::hex<< std::setw(2) << std::setfill('0')
-                  << "0x" << opcode << std::dec << std::endl;
+        std::cout << std::hex<< std::setw(2) << std::setfill('0') << "0x" << opcode << std::dec << "|" << std::endl;
     }
 }
