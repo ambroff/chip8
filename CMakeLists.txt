@@ -12,7 +12,7 @@ set(SOURCE_FILES
   src/decode.hpp
   src/instructions.hpp
   src/cpu.hpp
-  )
+  src/boundedstack.hpp)
 add_executable(chip8 ${SOURCE_FILES})
 
 enable_testing()

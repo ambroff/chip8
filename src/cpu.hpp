@@ -4,6 +4,8 @@
 #include <ostream>
 #include <iomanip>
 
+#include "boundedstack.hpp"
+
 namespace chip8 {
     const uint16_t REGISTER_COUNT{16};
     const uint16_t STACK_SIZE{16};
@@ -13,7 +15,7 @@ namespace chip8 {
     struct CPU final {
         std::array<uint8_t, MemorySize> memory;
         std::array<uint8_t, RegisterCount> V;
-        std::array<uint16_t, StackSize> stack;
+        boundedstack<uint16_t, StackSize> stack;
 
         uint16_t pc{0x200};
         uint16_t I{0};
@@ -26,7 +28,7 @@ namespace chip8 {
         void reset() {
             std::fill(V.begin(), V.end(), 0);
             std::fill(fb.begin(), fb.end(), false);
-            std::fill(stack.begin(), stack.end(), 0);
+            stack.clear();
             std::fill(memory.begin(), memory.end(), 0);
             pc = 0x200;
             I = 0;
@@ -51,11 +53,11 @@ namespace chip8 {
             outputStream << "soundTimer:\t" << std::dec << static_cast<int>(soundTimer) << std::endl;
             outputStream << std::endl;
 
-            outputStream << "Stack:" << std::endl;
-            for (int i = 0; i < stack.size(); i++) {
-                outputStream << std::hex << std::setfill('0') << std::setw(2) << stack[i] << ' ';
-            }
-            outputStream << std::endl;
+//            outputStream << "Stack:" << std::endl;
+//            for (int i = 0; i < stack.size(); i++) {
+//                outputStream << std::hex << std::setfill('0') << std::setw(2) << stack[i] << ' ';
+//            }
+//            outputStream << std::endl;
 
 //            outputStream << std::endl << "Frame buffer:" << std::endl;
 //            for (int i = 1; i <= fb.size(); i++) {

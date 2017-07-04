@@ -4,8 +4,10 @@
 #define BOOST_TEST_DYN_LINK 1
 #define BOOST_TEST_MODULE "instructions"
 
-#include <boost/test/unit_test.hpp>
+#include <algorithm>
 #include <iostream>
+
+#include <boost/test/unit_test.hpp>
 
 #include "cpu.hpp"
 #include "instructions.hpp"
@@ -143,6 +145,35 @@ BOOST_AUTO_TEST_CASE(bitwise_xor_instruction) {
 
     BOOST_CHECK_EQUAL(cpu.V[1], 0xFF);
     BOOST_CHECK_EQUAL(cpu.V[9], 0x0F);
+}
+
+BOOST_AUTO_TEST_CASE(system_call_instruction) {
+    chip8::SystemCallInstruction systemCallInstruction{123};
+    BOOST_CHECK_EQUAL(systemCallInstruction.toString(), "SYS 123");
+
+    chip8::cpu_t unused_cpu;
+    unused_cpu.reset();
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    systemCallInstruction.execute(cpu);
+
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(cpu.V.begin(), cpu.V.end(), unused_cpu.V.begin(), unused_cpu.V.end());
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        cpu.memory.begin(), cpu.memory.end(),
+        unused_cpu.memory.begin(), unused_cpu.memory.end());
+}
+
+BOOST_AUTO_TEST_CASE(call_instruction) {
+    chip8::CallInstruction instruction{0x2123};
+    BOOST_CHECK_EQUAL(instruction.toString(), "CALL 0x2123");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.pc, 0x2123);
 }
 
 #pragma clang diagnostic pop

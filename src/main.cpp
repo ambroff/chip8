@@ -9,10 +9,11 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <iterator>
+#include <cstring>
 
 #include "cpu.hpp"
 #include "decode.hpp"
-#include "instructions.hpp"
 
 namespace chip8 {
     class Machine final {

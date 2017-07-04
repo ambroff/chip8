@@ -16,14 +16,17 @@ namespace chip8 {
     /**
      * 0NNN	Execute machine language subroutine at address NNN
      */
-    class ExecuteMachineSubroutineInstruction : public Instruction {
+    class SystemCallInstruction : public Instruction {
     public:
-        explicit ExecuteMachineSubroutineInstruction(uint16_t address)
+        explicit SystemCallInstruction(uint16_t address)
             : mAddress(address) {
         }
 
         void execute(cpu_t &cpu) const override {
-            throw std::exception{};
+        }
+
+        std::string toString() const override {
+            return "SYS " + std::to_string(mAddress);
         }
 
     private:
@@ -50,7 +53,8 @@ namespace chip8 {
     class ReturnInstruction : public Instruction {
     public:
         void execute(cpu_t& cpu) const override {
-            cpu.pc = cpu.stack[cpu.I--];
+            cpu.pc = cpu.stack.top();
+            cpu.stack.pop();
         }
 
         std::string toString() const override {
@@ -83,11 +87,23 @@ namespace chip8 {
     /**
      * 2NNN	Execute subroutine starting at address NNN
      */
-    class ExecuteSubroutineInstruction : public Instruction {
+    class CallInstruction : public Instruction {
     public:
-        ExecuteSubroutineInstruction(uint16_t targetAddress)
+        CallInstruction(uint16_t targetAddress)
             : mTargetAddress(targetAddress)
         {
+        }
+
+        std::string toString() const override {
+            std::ostringstream s;
+            s << "CALL 0x" << std::hex << mTargetAddress;
+            return s.str();
+        }
+
+        void execute(cpu_t &cpu) const override {
+            cpu.stack.push(cpu.pc);
+            // FIXME: Validate target address and throw an error?
+            cpu.pc = mTargetAddress;
         }
 
     private:
