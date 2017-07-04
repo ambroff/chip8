@@ -14,7 +14,7 @@
 
 BOOST_AUTO_TEST_CASE(test_store_in_register) {
     chip8::StoreInVxInstruction storeInVxInstruction{5, 123};
-    BOOST_CHECK_EQUAL(storeInVxInstruction.toString(), "MOV V5, 123");
+    BOOST_CHECK_EQUAL(storeInVxInstruction.toString(), "MOV V5, 0x7b");
 
     chip8::cpu_t cpu;
     cpu.reset();
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(subtract_instruction) {
 
 BOOST_AUTO_TEST_CASE(increment_instruction) {
     chip8::IncrementInstruction instruction{5, 3};
-    BOOST_CHECK_EQUAL(instruction.toString(), "INC V5, 3");
+    BOOST_CHECK_EQUAL(instruction.toString(), "INC V5, 0x3");
 
     chip8::cpu_t cpu;
     cpu.reset();
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(bitwise_xor_instruction) {
 
 BOOST_AUTO_TEST_CASE(system_call_instruction) {
     chip8::SystemCallInstruction systemCallInstruction{123};
-    BOOST_CHECK_EQUAL(systemCallInstruction.toString(), "SYS 123");
+    BOOST_CHECK_EQUAL(systemCallInstruction.toString(), "SYS 0x7b");
 
     chip8::cpu_t unused_cpu;
     unused_cpu.reset();
@@ -174,6 +174,17 @@ BOOST_AUTO_TEST_CASE(call_instruction) {
     instruction.execute(cpu);
 
     BOOST_CHECK_EQUAL(cpu.pc, 0x2123);
+}
+
+BOOST_AUTO_TEST_CASE(jump_instruction) {
+    chip8::JumpInstruction instruction{123};
+    BOOST_CHECK_EQUAL(instruction.toString(), "JMP 0x7b");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.pc, 0x7b);
 }
 
 #pragma clang diagnostic pop

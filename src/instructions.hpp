@@ -26,7 +26,9 @@ namespace chip8 {
         }
 
         std::string toString() const override {
-            return "SYS " + std::to_string(mAddress);
+            std::ostringstream s;
+            s << "SYS 0x" << std::hex << mAddress;
+            return s.str();
         }
 
     private:
@@ -77,7 +79,9 @@ namespace chip8 {
         }
 
         std::string toString() const override {
-            return "JMP " + std::to_string(mTargetAddress);
+            std::ostringstream s;
+            s << "JMP 0x" << std::hex << mTargetAddress;
+            return s.str();
         }
 
     private:
@@ -174,7 +178,9 @@ namespace chip8 {
         }
 
         std::string toString() const override {
-            return "MOV V" + std::to_string(mRegIdx) + ", " + std::to_string(mValue);
+            std::ostringstream s;
+            s << "MOV V" << std::to_string(mRegIdx) << ", 0x" << std::hex << static_cast<int>(mValue);
+            return s.str();
         }
 
     private:
@@ -198,7 +204,9 @@ namespace chip8 {
         }
 
         std::string toString() const override {
-            return "INC V" + std::to_string(mRegister) + ", " + std::to_string(mValue);
+            std::ostringstream s;
+            s << "INC V" << std::to_string(mRegister) + ", 0x" << std::hex << static_cast<int>(mValue);
+            return s.str();
         }
 
     private:
