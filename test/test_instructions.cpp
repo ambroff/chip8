@@ -187,4 +187,21 @@ BOOST_AUTO_TEST_CASE(jump_instruction) {
     BOOST_CHECK_EQUAL(cpu.pc, 0x7b);
 }
 
+BOOST_AUTO_TEST_CASE(skip_if_equals_instruction) {
+    chip8::SkipIfVxEqualsInstruction instruction{2, 5};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SKE V2, 0x5");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    uint16_t starting_point{cpu.pc};
+
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.pc, starting_point);
+
+    cpu.V[2] = 5;
+
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.pc, starting_point + 2);
+}
+
 #pragma clang diagnostic pop

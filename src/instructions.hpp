@@ -125,6 +125,18 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override {
+            if (cpu.V[mRegister] == mValue) {
+                cpu.pc += 2;
+            }
+        }
+
+        std::string toString() const override {
+            std::ostringstream s;
+            s << "SKE V" << std::to_string(mRegister) << ", 0x" << std::hex << static_cast<int>(mValue);
+            return s.str();
+        }
+
     private:
         uint8_t mRegister;
         uint8_t mValue;
