@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <boost/test/unit_test.hpp>
+#include <instructions.hpp>
 
 #include "cpu.hpp"
 #include "instructions.hpp"
@@ -278,6 +279,55 @@ BOOST_AUTO_TEST_CASE(store_i_register_instruction) {
     instruction.execute(cpu);
 
     BOOST_CHECK_EQUAL(cpu.I, 123);
+}
+
+BOOST_AUTO_TEST_CASE(jump_I_instruction) {
+    chip8::JumpIndexInstruction instruction{1239};
+    BOOST_CHECK_EQUAL(instruction.toString(), "JUMPI 0x4d7");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+
+    cpu.V[0] = 1;
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.pc, 1240);
+}
+
+BOOST_AUTO_TEST_CASE(stor_instruction) {
+    chip8::StoreRegistersInstruction instruction{5};
+    BOOST_CHECK_EQUAL(instruction.toString(), "STOR V5");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+
+    cpu.V[0] = 99;
+    cpu.V[1] = 98;
+    cpu.V[2] = 97;
+    cpu.V[3] = 96;
+    cpu.V[4] = 95;
+    cpu.V[5] = 94;
+
+    cpu.I = 0x900;
+
+    instruction.execute(cpu);
+
+    cpu.memory[0x900] ==
+}
+
+BOOST_AUTO_TEST_CASE(read_instruction) {
+    chip8::RestoreRegistersInstruction instruction{6};
+    BOOST_CHECK_EQUAL(instruction.toString(), "READ V6");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+
+    cpu.I = 0x900;
+
+    instruction.execute(cpu);
+
+    cpu.memory[0x900] ==
 }
 
 #pragma clang diagnostic pop

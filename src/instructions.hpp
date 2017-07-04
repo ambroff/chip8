@@ -474,11 +474,21 @@ namespace chip8 {
     /**
      * BNNN	Jump to address NNN + V0
      */
-    class JumpToAddressInstruction : public Instruction {
+    class JumpIndexInstruction : public Instruction {
     public:
-        JumpToAddressInstruction(uint16_t target_address)
+        JumpIndexInstruction(uint16_t target_address)
             : mTargetAddress(target_address)
         {
+        }
+
+        void execute(cpu_t &cpu) const override {
+            cpu.pc = cpu.V[0] + mTargetAddress;
+        }
+
+        std::string toString() const override {
+            std::ostringstream s;
+            s << "JUMPI 0x" << std::hex << static_cast<int>(mTargetAddress);
+            return s.str();
         }
 
     private:
@@ -673,6 +683,15 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override {
+            std::copy_n(cpu.V.begin(), mUpToRegister, cpu.memory.begin() + cpu.I);
+            cpu.I = cpu.I + mUpToRegister + static_cast<uint16_t>(1);
+        }
+
+        std::string toString() const override {
+            return "STOR V" + std::to_string(mUpToRegister);
+        }
+
     private:
         uint8_t mUpToRegister;
     };
@@ -686,6 +705,14 @@ namespace chip8 {
         RestoreRegistersInstruction(uint8_t up_to_register)
             : mUpToRegister(up_to_register)
         {
+        }
+
+        void execute(cpu_t &cpu) const override {
+
+        }
+
+        std::string toString() const override {
+            return "READ V" + std::to_string(mUpToRegister);
         }
 
     private:
