@@ -153,6 +153,18 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override {
+            if (cpu.V[mRegister] != mValue) {
+                cpu.pc += 2;
+            }
+        }
+
+        std::string toString() const override {
+            std::ostringstream s;
+            s << "SKNE V" << std::to_string(mRegister) << ", 0x" << std::hex << static_cast<int>(mValue);
+            return s.str();
+        }
+
     private:
         uint8_t mRegister;
         uint8_t mValue;
@@ -167,6 +179,16 @@ namespace chip8 {
             : mRegisterX(reg_x),
               mRegisterY(reg_y)
         {
+        }
+
+        void execute(cpu_t &cpu) const override {
+            if (cpu.V[mRegisterX] == cpu.V[mRegisterY]) {
+                cpu.pc += 2;
+            }
+        }
+
+        std::string toString() const override {
+            return "SKRE V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
         }
 
     private:
@@ -229,12 +251,20 @@ namespace chip8 {
     /**
      * 8XY0	Store the value of register VY in register VX
      */
-    class StoreVxInVyInstruction : public Instruction {
+    class MoveInstruction : public Instruction {
     public:
-        StoreVxInVyInstruction(uint8_t reg_x, uint8_t reg_y)
+        MoveInstruction(uint8_t reg_x, uint8_t reg_y)
             : mRegisterX(reg_x),
               mRegisterY(reg_y)
         {
+        }
+
+        void execute(cpu_t &cpu) const override {
+            cpu.V[mRegisterX] = cpu.V[mRegisterY];
+        }
+
+        std::string toString() const override {
+            return "MOV V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
         }
 
     private:
@@ -402,6 +432,16 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override {
+            if (cpu.V[mRegisterX] != cpu.V[mRegisterY]) {
+                cpu.pc += 2;
+            }
+        }
+
+        std::string toString() const override {
+            return "SKRNE V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
+        }
+
     private:
         uint8_t mRegisterX;
         uint8_t mRegisterY;
@@ -410,11 +450,21 @@ namespace chip8 {
     /**
      * ANNN	Store memory address NNN in register I
      */
-    class StoreAddressInstruction : public Instruction {
+    class LoadIndexInstruction : public Instruction {
     public:
-        StoreAddressInstruction(uint16_t address)
+        LoadIndexInstruction(uint16_t address)
             : mAddress(address)
         {
+        }
+
+        void execute(cpu_t &cpu) const override {
+            cpu.I = mAddress;
+        }
+
+        std::string toString() const override {
+            std::ostringstream s;
+            s << "LOADI 0x" << std::hex << static_cast<int>(mAddress);
+            return s.str();
         }
 
     private:

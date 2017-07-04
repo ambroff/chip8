@@ -204,4 +204,80 @@ BOOST_AUTO_TEST_CASE(skip_if_equals_instruction) {
     BOOST_CHECK_EQUAL(cpu.pc, starting_point + 2);
 }
 
+BOOST_AUTO_TEST_CASE(skip_if_not_equals_instruction) {
+    chip8::SkipIfVxNotEqualInstruction instruction{3, 123};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SKNE V3, 0x7b");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[3] = 123;
+    uint16_t starting_point{cpu.pc};
+
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.pc, starting_point);
+
+    cpu.V[3] = 99;
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.pc, starting_point + 2);
+}
+
+BOOST_AUTO_TEST_CASE(skip_if_reg_equals_instruction) {
+    chip8::SkipIfVxEqualsVyInstruction instruction{3, 9};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SKRE V3, V9");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[9] = 2;
+
+    uint16_t starting_point{cpu.pc};
+
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.pc, starting_point);
+
+    cpu.V[9] = 0;
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.pc, starting_point + 2);
+}
+
+BOOST_AUTO_TEST_CASE(move_instruction) {
+    chip8::MoveInstruction moveInstruction{2, 9};
+    BOOST_CHECK_EQUAL(moveInstruction.toString(), "MOV V2, V9");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[9] = 23;
+
+    moveInstruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[2], cpu.V[9]);
+}
+
+BOOST_AUTO_TEST_CASE(skip_if_register_not_equals_instruction) {
+    chip8::SkipIfVxNotEqualsVyInstruction instruction{2, 3};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SKRNE V2, V3");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    uint16_t starting_point{cpu.pc};
+
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.pc, starting_point);
+
+    cpu.V[2] = 5;
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.pc, starting_point + 2);
+}
+
+BOOST_AUTO_TEST_CASE(store_i_register_instruction) {
+    chip8::LoadIndexInstruction instruction{123};
+    BOOST_CHECK_EQUAL(instruction.toString(), "LOADI 0x7b");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.I, 123);
+}
+
 #pragma clang diagnostic pop
