@@ -366,4 +366,48 @@ BOOST_AUTO_TEST_CASE(bcd_instruction) {
     BOOST_CHECK_EQUAL(cpu.memory[0x902], 9);
 }
 
+BOOST_AUTO_TEST_CASE(shift_left_instruction) {
+    chip8::ShiftLeftInstruction instruction{3, 5};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SHL V3, V5");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[3] = 64;
+    cpu.V[5] = 1;
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[3], 128);
+    BOOST_CHECK_EQUAL(cpu.V[5], 1);
+    BOOST_CHECK_EQUAL(cpu.V[15], 0);
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[3], 0);
+    BOOST_CHECK_EQUAL(cpu.V[5], 1);
+    BOOST_CHECK_EQUAL(cpu.V[15], 1);
+}
+
+BOOST_AUTO_TEST_CASE(shift_right_instruction) {
+    chip8::ShiftRightInstruction instruction{3, 5};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SHR V3, V5");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[3] = 2;
+    cpu.V[5] = 1;
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[3], 1);
+    BOOST_CHECK_EQUAL(cpu.V[5], 1);
+    BOOST_CHECK_EQUAL(cpu.V[15], 0);
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[3], 0);
+    BOOST_CHECK_EQUAL(cpu.V[5], 1);
+    BOOST_CHECK_EQUAL(cpu.V[15], 1);
+}
+
 #pragma clang diagnostic pop

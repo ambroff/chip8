@@ -373,13 +373,6 @@ namespace chip8 {
     };
 
     /**
-     * 8XY6	Store the value of register VY shifted right one bit in register VX
-     * Set register VF to the least significant bit prior to the shift
-     */
-    class ShiftRightInstruction : public Instruction {
-    };
-
-    /**
      * 8XY7	Set register VX to the value of VY minus VX
      * Set VF to 00 if a borrow occurs
      * Set VF to 01 if a borrow does not occur
@@ -407,6 +400,34 @@ namespace chip8 {
     };
 
     /**
+     * 8XY6	Store the value of register VY shifted right one bit in register VX
+     * Set register VF to the least significant bit prior to the shift
+     */
+    class ShiftRightInstruction : public Instruction {
+    public:
+        ShiftRightInstruction(uint8_t reg_x, uint8_t reg_y)
+            : mRegisterX(reg_x),
+              mRegisterY(reg_y)
+        {
+        }
+
+        void execute(cpu_t &cpu) const override
+        {
+            cpu.V[15] = cpu.V[mRegisterX] & static_cast<uint8_t>(0x1);
+            cpu.V[mRegisterX] = cpu.V[mRegisterX] >> cpu.V[mRegisterY];
+        }
+
+        std::string toString() const override
+        {
+            return "SHR V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
+        }
+
+    private:
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
+    };
+
+    /**
      * 8XYE	Store the value of register VY shifted left one bit in register VX
      * Set register VF to the most significant bit prior to the shift
      */
@@ -416,6 +437,17 @@ namespace chip8 {
             : mRegisterX(reg_x),
               mRegisterY(reg_y)
         {
+        }
+
+        void execute(cpu_t &cpu) const override
+        {
+            cpu.V[15] = (cpu.V[mRegisterX] >> 7) & static_cast<uint8_t>(0x01);
+            cpu.V[mRegisterX] = cpu.V[mRegisterX] << cpu.V[mRegisterY];
+        }
+
+        std::string toString() const override
+        {
+            return "SHL V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
         }
 
     private:
