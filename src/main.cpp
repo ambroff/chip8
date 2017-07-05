@@ -14,12 +14,16 @@
 
 #include "cpu.hpp"
 #include "decode.hpp"
+#include "font.hpp"
 
 namespace chip8 {
     class Machine final {
     public:
         void reset() {
             mCpu.reset();
+
+            // Load the font
+            std::copy(FONT.begin(), FONT.end(), mCpu.memory.begin());
         }
 
         void loadProgram(std::ifstream &inputStream) {
