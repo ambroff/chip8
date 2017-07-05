@@ -410,4 +410,34 @@ BOOST_AUTO_TEST_CASE(shift_right_instruction) {
     BOOST_CHECK_EQUAL(cpu.V[15], 1);
 }
 
+template<typename T>
+class MockRandomNumberGenerator : public chip8::RandomNumberGenerator<T>
+{
+public:
+    MockRandomNumberGenerator(T value)
+        : mValue(value)
+    {
+    }
+
+    T getNext() override
+    {
+        return mValue;
+    }
+
+private:
+    T mValue;
+};
+
+BOOST_AUTO_TEST_CASE(random_instruction) {
+    auto rng = std::make_shared<MockRandomNumberGenerator<uint8_t>>(9);
+    chip8::StoreRandomWithMaskInstruction instruction{2, 255, rng};
+    BOOST_CHECK_EQUAL(instruction.toString(), "RND V2, 255");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[2], 9);
+}
+
 #pragma clang diagnostic pop

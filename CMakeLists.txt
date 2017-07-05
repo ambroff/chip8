@@ -13,6 +13,7 @@ set(HEADER_FILES
   src/decode.hpp
   src/font.hpp
   src/instructions.hpp
+  src/random.hpp
   )
 
 set(SOURCE_FILES

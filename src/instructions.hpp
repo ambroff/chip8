@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "cpu.hpp"
+#include "random.hpp"
 
 namespace chip8 {
 #pragma clang diagnostic push
@@ -534,15 +535,34 @@ namespace chip8 {
      */
     class StoreRandomWithMaskInstruction : public Instruction {
     public:
-        StoreRandomWithMaskInstruction(uint8_t reg, uint8_t value)
+        StoreRandomWithMaskInstruction(uint8_t reg, uint8_t mask)
             : mRegister(reg),
-              mValue(value)
+              mMask(mask),
+              mRNG(std::make_shared<RealRandomNumberGenerator<uint8_t>>())
         {
+        }
+
+        StoreRandomWithMaskInstruction(uint8_t reg, uint8_t mask, std::shared_ptr<RandomNumberGenerator<uint8_t>> rng)
+            : mRegister(reg),
+              mMask(mask),
+              mRNG(rng)
+        {
+        }
+
+        void execute(cpu_t &cpu) const override
+        {
+            cpu.V[mRegister] = mRNG->getNext() & mMask;
+        }
+
+        std::string toString() const override
+        {
+            return "RND V" + std::to_string(mRegister) + ", " + std::to_string(mMask);
         }
 
     private:
         uint8_t mRegister;
-        uint8_t mValue;
+        uint8_t mMask;
+        std::shared_ptr<RandomNumberGenerator<uint8_t>> mRNG;
     };
 
     /**
