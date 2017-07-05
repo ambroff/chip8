@@ -7,12 +7,21 @@ set(DISASSEMBLER_SOURCE_FILES disassembler/disassembler.cpp)
 add_executable(disassembler ${DISASSEMBLER_SOURCE_FILES})
 target_include_directories(disassembler PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+set(HEADER_FILES
+  src/boundedstack.hpp
+  src/cpu.hpp
+  src/decode.hpp
+  src/font.hpp
+  src/instructions.hpp
+  )
+
 set(SOURCE_FILES
   src/main.cpp
-  src/decode.hpp
-  src/instructions.hpp
-  src/cpu.hpp
-  src/boundedstack.hpp)
+  )
+
+set_source_files_properties(${HEADER_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+list(APPEND SOURCE_FILES ${HEADER_FILES})
+
 add_executable(chip8 ${SOURCE_FILES})
 
 enable_testing()
