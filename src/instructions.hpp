@@ -680,6 +680,14 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override {
+            cpu.soundTimer = cpu.V[mRegister];
+        }
+
+        std::string toString() const override {
+            return "LOADS V" + std::to_string(mRegister);
+        }
+
     private:
         uint8_t mRegister;
     };

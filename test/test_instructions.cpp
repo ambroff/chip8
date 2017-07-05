@@ -440,4 +440,16 @@ BOOST_AUTO_TEST_CASE(random_instruction) {
     BOOST_CHECK_EQUAL(cpu.V[2], 9);
 }
 
+BOOST_AUTO_TEST_CASE(set_sound_timer_instruction) {
+    chip8::SetSoundTimerInstruction instruction{7};
+    BOOST_CHECK_EQUAL(instruction.toString(), "LOADS V7");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[7] = 0x80;
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.soundTimer, 0x80);
+}
+
 #pragma clang diagnostic pop
