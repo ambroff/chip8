@@ -670,6 +670,18 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override
+        {
+            cpu.memory[cpu.I] = cpu.V[mRegister] / static_cast<uint8_t>(100) % static_cast<uint8_t>(10);
+            cpu.memory[cpu.I + 1] = cpu.V[mRegister] / static_cast<uint8_t>(10) % static_cast<uint8_t>(10);
+            cpu.memory[cpu.I + 2] = cpu.V[mRegister] % static_cast<uint8_t>(10);
+        }
+
+        std::string toString() const override
+        {
+            return "BCD V" + std::to_string(mRegister);
+        }
+
     private:
         uint8_t mRegister;
     };

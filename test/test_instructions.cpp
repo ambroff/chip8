@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include <boost/test/unit_test.hpp>
-#include <instructions.hpp>
 
 #include "cpu.hpp"
 #include "instructions.hpp"
@@ -320,6 +319,8 @@ BOOST_AUTO_TEST_CASE(stor_instruction) {
     BOOST_CHECK_EQUAL(cpu.memory[0x904], 95);
     BOOST_CHECK_EQUAL(cpu.memory[0x905], 94);
     BOOST_CHECK_EQUAL(cpu.memory[0x906], 0);
+
+    BOOST_CHECK_EQUAL(cpu.I, 0x906);
 }
 
 BOOST_AUTO_TEST_CASE(read_instruction) {
@@ -347,6 +348,22 @@ BOOST_AUTO_TEST_CASE(read_instruction) {
     BOOST_CHECK_EQUAL(cpu.V[4], 95);
     BOOST_CHECK_EQUAL(cpu.V[5], 94);
     BOOST_CHECK_EQUAL(cpu.V[6], 0);
+}
+
+BOOST_AUTO_TEST_CASE(bcd_instruction) {
+    chip8::StoreDecimalInstruction instruction{3};
+    BOOST_CHECK_EQUAL(instruction.toString(), "BCD V3");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.I = 0x900;
+    cpu.V[3] = 139;
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.memory[0x900], 1);
+    BOOST_CHECK_EQUAL(cpu.memory[0x901], 3);
+    BOOST_CHECK_EQUAL(cpu.memory[0x902], 9);
 }
 
 #pragma clang diagnostic pop
