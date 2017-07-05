@@ -313,7 +313,13 @@ BOOST_AUTO_TEST_CASE(stor_instruction) {
 
     instruction.execute(cpu);
 
-    cpu.memory[0x900] ==
+    BOOST_CHECK_EQUAL(cpu.memory[0x900], 99);
+    BOOST_CHECK_EQUAL(cpu.memory[0x901], 98);
+    BOOST_CHECK_EQUAL(cpu.memory[0x902], 97);
+    BOOST_CHECK_EQUAL(cpu.memory[0x903], 96);
+    BOOST_CHECK_EQUAL(cpu.memory[0x904], 95);
+    BOOST_CHECK_EQUAL(cpu.memory[0x905], 94);
+    BOOST_CHECK_EQUAL(cpu.memory[0x906], 0);
 }
 
 BOOST_AUTO_TEST_CASE(read_instruction) {
@@ -323,11 +329,24 @@ BOOST_AUTO_TEST_CASE(read_instruction) {
     chip8::cpu_t cpu;
     cpu.reset();
 
+    cpu.memory[0x900] = 99;
+    cpu.memory[0x901] = 98;
+    cpu.memory[0x902] = 97;
+    cpu.memory[0x903] = 96;
+    cpu.memory[0x904] = 95;
+    cpu.memory[0x905] = 94;
+
     cpu.I = 0x900;
 
     instruction.execute(cpu);
 
-    cpu.memory[0x900] ==
+    BOOST_CHECK_EQUAL(cpu.V[0], 99);
+    BOOST_CHECK_EQUAL(cpu.V[1], 98);
+    BOOST_CHECK_EQUAL(cpu.V[2], 97);
+    BOOST_CHECK_EQUAL(cpu.V[3], 96);
+    BOOST_CHECK_EQUAL(cpu.V[4], 95);
+    BOOST_CHECK_EQUAL(cpu.V[5], 94);
+    BOOST_CHECK_EQUAL(cpu.V[6], 0);
 }
 
 #pragma clang diagnostic pop

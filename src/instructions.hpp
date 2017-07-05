@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sstream>
+
 #include "cpu.hpp"
 
 namespace chip8 {
@@ -684,8 +686,9 @@ namespace chip8 {
         }
 
         void execute(cpu_t &cpu) const override {
-            std::copy_n(cpu.V.begin(), mUpToRegister, cpu.memory.begin() + cpu.I);
-            cpu.I = cpu.I + mUpToRegister + static_cast<uint16_t>(1);
+            auto byte_count = mUpToRegister + static_cast<uint16_t>(1);
+            std::copy_n(cpu.V.begin(), byte_count, cpu.memory.begin() + cpu.I);
+            cpu.I = cpu.I + byte_count;
         }
 
         std::string toString() const override {
@@ -708,7 +711,9 @@ namespace chip8 {
         }
 
         void execute(cpu_t &cpu) const override {
-
+            auto byte_count = mUpToRegister + static_cast<uint16_t>(1);
+            std::copy_n(cpu.memory.begin() + cpu.I, byte_count, cpu.V.begin());
+            cpu.I = cpu.I + byte_count + static_cast<uint16_t>(1);
         }
 
         std::string toString() const override {
