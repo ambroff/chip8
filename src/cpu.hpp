@@ -59,15 +59,15 @@ namespace chip8 {
 //            }
 //            outputStream << std::endl;
 
-//            outputStream << std::endl << "Frame buffer:" << std::endl;
-//            for (int i = 1; i <= fb.size(); i++) {
-//                int pixel = fb[i-1] ? 1 : 0;
-//                outputStream << pixel;
-//                if (i % 64 == 0) {
-//                    outputStream << std::endl;
-//                }
-//            }
-//            outputStream << std::endl;
+            outputStream << std::endl << "Frame buffer:" << std::endl;
+            for (int i = 1; i <= fb.size(); i++) {
+                int pixel = fb[i-1] ? 1 : 0;
+                outputStream << pixel;
+                if (i % 64 == 0) {
+                    outputStream << std::endl;
+                }
+            }
+            outputStream << std::endl;
 
 //            outputStream << "Main memory:" << std::endl;
 //            for (int i = 1; i < memory.size(); i++) {

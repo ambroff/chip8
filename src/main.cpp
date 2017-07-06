@@ -23,7 +23,7 @@ namespace chip8 {
             mCpu.reset();
 
             // Load the font
-            std::copy(FONT.begin(), FONT.end(), mCpu.memory.begin());
+            std::copy(FONT_DATA.begin(), FONT_DATA.end(), mCpu.memory.begin() + FONT_DATA_OFFSET);
         }
 
         void loadProgram(std::ifstream &inputStream) {

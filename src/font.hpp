@@ -19,7 +19,7 @@ namespace chip8 {
         NUMERAL_C = FONT_DATA_OFFSET + 60,
         NUMERAL_D = FONT_DATA_OFFSET + 65,
         NUMERAL_E = FONT_DATA_OFFSET + 70,
-        NUMERAL_F = FONT_DATA_OFFSE  + 75
+        NUMERAL_F = FONT_DATA_OFFSET + 75
     };
 
     const std::array<uint8_t, 5 * 16> FONT_DATA{

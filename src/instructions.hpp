@@ -578,6 +578,49 @@ namespace chip8 {
         {
         }
 
+        /**
+         * Description from: http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#Dxyn
+         *
+         * Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+         *
+         * The interpreter reads n bytes from memory, starting at the address stored in I. These bytes are then
+         * displayed as sprites on screen at coordinates (Vx, Vy). Sprites are XORed onto the existing screen. If this
+         * causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. If the sprite is positioned so
+         * part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen.
+         */
+        void execute(cpu_t &cpu) const override {
+            auto x = cpu.V[mRegisterX];
+            auto y = cpu.V[mRegisterY];
+
+            auto iter = cpu.memory.begin() + cpu.I;
+            auto end = cpu.memory.begin() + cpu.I + mLength + 1;
+            auto line = 0;
+            while (iter != end) {
+                auto row = *iter;
+
+                for (int pixel = 0; pixel < 8; pixel++) {
+                    if (row & (0x80 >> pixel)) {
+                        int fbIdx = x + pixel + ((y + line) * 64);
+
+                        if (cpu.fb[fbIdx]) {
+                            cpu.V[15] = 0x1;
+                        }
+
+                        cpu.fb[fbIdx] ^= true;
+                    }
+                }
+
+                ++iter;
+                ++line;
+            }
+        }
+
+        std::string toString() const override {
+            return "DRW V" + std::to_string(mRegisterX) + ", V"
+                   + std::to_string(mRegisterY) + ", "
+                   + std::to_string(mLength);
+        }
+
     private:
         uint8_t mRegisterX;
         uint8_t mRegisterY;
@@ -643,6 +686,14 @@ namespace chip8 {
         WaitForKeypressInstruction(uint8_t reg)
             : mRegister(reg)
         {
+        }
+
+        void execute(cpu_t &cpu) const override {
+            assert(false);
+        }
+
+        std::string toString() const override {
+            return "KEYD";
         }
 
     private:
