@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 
         std::unique_ptr<chip8::Instruction> instruction = chip8::decode_opcode(opcode);
         if (!instruction) {
-            std::cerr << "Unknown opcode: " << opcode << std::endl;
+            std::cerr << "Unknown opcode: " << std::hex << opcode << std::dec << std::endl;
             return 1;
         }
 
