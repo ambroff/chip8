@@ -585,4 +585,24 @@ BOOST_AUTO_TEST_CASE(draw_sprite_instruction) {
         expected_frame_buffer.begin(), expected_frame_buffer.end());
 }
 
+BOOST_AUTO_TEST_CASE(add_instruction) {
+    chip8::AddInstruction instruction{1, 2};
+    BOOST_CHECK_EQUAL(instruction.toString(), "ADD V1, V2");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[1] = 252;
+    cpu.V[2] = 2;
+
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.V[1], 254);
+    BOOST_CHECK_EQUAL(cpu.V[15], 0);
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.V[1], 1);
+    BOOST_CHECK_EQUAL(cpu.V[15], 1);
+
+}
+
 #pragma clang diagnostic pop

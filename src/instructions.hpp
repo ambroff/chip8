@@ -360,6 +360,20 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override {
+            cpu.V[mRegisterX] = cpu.V[mRegisterX] + cpu.V[mRegisterY];
+
+            if (cpu.V[mRegisterY] > (0xFF - cpu.V[mRegisterX])) {
+                cpu.V[15] = 0x1;
+            } else {
+                cpu.V[15] = 0x0;
+            }
+        }
+
+        std::string toString() const override {
+            return "ADD V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
+        }
+
     private:
         uint8_t mRegisterX;
         uint8_t mRegisterY;
