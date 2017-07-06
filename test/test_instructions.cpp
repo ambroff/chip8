@@ -585,6 +585,7 @@ BOOST_AUTO_TEST_CASE(draw_sprite_instruction) {
         expected_frame_buffer.begin(), expected_frame_buffer.end());
 }
 
+// TODO: Validate that carry is handled appropriately
 BOOST_AUTO_TEST_CASE(add_instruction) {
     chip8::AddInstruction instruction{1, 2};
     BOOST_CHECK_EQUAL(instruction.toString(), "ADD V1, V2");
@@ -602,7 +603,61 @@ BOOST_AUTO_TEST_CASE(add_instruction) {
 
     BOOST_CHECK_EQUAL(cpu.V[1], 0);
     BOOST_CHECK_EQUAL(cpu.V[15], 1);
+}
 
+// TODO: Implement borrow detection
+BOOST_AUTO_TEST_CASE(decrement_instruction) {
+    chip8::DecrementInstruction instruction{1, 2};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SUB V1, V2");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[1] = 5;
+    cpu.V[2] = 3;
+
+    instruction.execute(cpu);
+    BOOST_CHECK_EQUAL(cpu.V[1], 2);
+    BOOST_CHECK_EQUAL(cpu.V[15], 1);
+}
+
+// TODO: Implement SKP
+BOOST_AUTO_TEST_CASE(skip_if_key_pressed_instruction) {
+    chip8::SkipIfKeyPressedInstruction instruction{1};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SKP V1");
+}
+
+// TODO: Implement SKNP
+BOOST_AUTO_TEST_CASE(skip_if_key_not_pressed_instruction) {
+    chip8::SkipIfKeyNotPressedInstruction instruction{1};
+    BOOST_CHECK_EQUAL(instruction.toString(), "SKNP V1");
+}
+
+BOOST_AUTO_TEST_CASE(add_to_I_instruction) {
+    chip8::AddToIInstruction instruction{1};
+    BOOST_CHECK_EQUAL(instruction.toString(), "ADDI V1");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[1] = 5;
+    cpu.I = 9;
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.I, 14);
+}
+
+BOOST_AUTO_TEST_CASE(load_I_instruction) {
+    chip8::StoreInIInstruction instruction{1};
+    BOOST_CHECK_EQUAL(instruction.toString(), "LOADI V1");
+
+    chip8::cpu_t cpu;
+    cpu.reset();
+    cpu.V[1] = 5;
+    cpu.I = 9;
+
+    instruction.execute(cpu);
+
+    BOOST_CHECK_EQUAL(cpu.I, 5);
 }
 
 #pragma clang diagnostic pop

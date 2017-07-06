@@ -385,6 +385,25 @@ namespace chip8 {
      * Set VF to 01 if a borrow does not occur
      */
     class DecrementInstruction : public Instruction {
+    public:
+        DecrementInstruction(uint8_t reg_x, uint8_t reg_y)
+            : mRegisterX(reg_x),
+              mRegisterY(reg_y)
+        {
+        }
+
+        void execute(cpu_t &cpu) const override {
+            cpu.V[mRegisterX] -= cpu.V[mRegisterY];
+            cpu.V[15] = 0x1;
+        }
+
+        std::string toString() const override {
+            return "SUB V" + std::to_string(mRegisterX) + ", V" + std::to_string(mRegisterY);
+        }
+
+    private:
+        uint8_t mRegisterX;
+        uint8_t mRegisterY;
     };
 
     /**
@@ -652,6 +671,14 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override {
+            assert(false);
+        }
+
+        std::string toString() const override {
+            return "SKP V" + std::to_string(mRegister);
+        }
+
     private:
         uint8_t mRegister;
     };
@@ -665,6 +692,14 @@ namespace chip8 {
         SkipIfKeyNotPressedInstruction(uint8_t reg)
             : mRegister(reg)
         {
+        }
+
+        void execute(cpu_t &cpu) const override {
+            assert(false);
+        }
+
+        std::string toString() const override {
+            return "SKNP V" + std::to_string(mRegister);
         }
 
     private:
@@ -767,6 +802,14 @@ namespace chip8 {
         {
         }
 
+        void execute(cpu_t &cpu) const override {
+            cpu.I += cpu.V[mRegister];
+        }
+
+        std::string toString() const override {
+            return "ADDI V" + std::to_string(mRegister);
+        }
+
     private:
         uint8_t mRegister;
     };
@@ -779,6 +822,14 @@ namespace chip8 {
         StoreInIInstruction(uint8_t reg)
             : mRegister(reg)
         {
+        }
+
+        void execute(cpu_t &cpu) const override {
+            cpu.I = cpu.V[mRegister];
+        }
+
+        std::string toString() const override {
+            return "LOADI V" + std::to_string(mRegister);
         }
 
     private:
