@@ -363,7 +363,7 @@ namespace chip8 {
         void execute(cpu_t &cpu) const override {
             cpu.V[mRegisterX] = cpu.V[mRegisterX] + cpu.V[mRegisterY];
 
-            if (cpu.V[mRegisterY] > (0xFF - cpu.V[mRegisterX])) {
+            if (cpu.V[mRegisterY] < (0xFF - cpu.V[mRegisterX])) {
                 cpu.V[15] = 0x1;
             } else {
                 cpu.V[15] = 0x0;

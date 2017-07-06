@@ -600,7 +600,7 @@ BOOST_AUTO_TEST_CASE(add_instruction) {
 
     instruction.execute(cpu);
 
-    BOOST_CHECK_EQUAL(cpu.V[1], 1);
+    BOOST_CHECK_EQUAL(cpu.V[1], 0);
     BOOST_CHECK_EQUAL(cpu.V[15], 1);
 
 }
