@@ -21,13 +21,17 @@ int main(int argc, char **argv)
 
     std::cout << "\t\tstart:" << std::endl;
 
-    char next[2];
+    uint8_t next[2];
     while (!image_file.eof()) {
-        image_file.read(next, 2);
+        image_file.read(reinterpret_cast<char *>(next), 2);
+
+        if (image_file.gcount() != 2) {
+            break;
+        }
 
         if (image_file.fail()) {
             if (image_file.eof()) {
-                break;
+                continue;
             } else {
                 std::cerr << "ERROR: Failed to read next opcode at offset: " << image_file.tellg() << std::endl;
                 return 1;
