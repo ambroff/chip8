@@ -6,11 +6,17 @@
  */
 #include <algorithm>
 #include <array>
-#include <fstream>
-#include <iostream>
+#include <chrono>
+#include <cstring>
 #include <iomanip>
 #include <iterator>
-#include <cstring>
+#include <iostream>
+#include <fstream>
+#include <thread>
+
+#include <boost/filesystem.hpp>
+
+#include <SFML/Graphics.hpp>
 
 #include "cpu.hpp"
 #include "decode.hpp"
@@ -19,6 +25,12 @@
 namespace chip8 {
     class Machine final {
     public:
+        Machine(sf::RenderWindow& window, int scalingFactor)
+            : mWindow(window),
+              mScalingFactor(scalingFactor)
+        {
+        }
+
         void reset() {
             mCpu.reset();
 
@@ -55,34 +67,80 @@ namespace chip8 {
             mCpu.pc += 2;
         }
 
+        int run() {
+            using namespace std::chrono_literals;
+
+            while (mWindow.isOpen()) {
+                sf::Event event;
+                while (mWindow.pollEvent(event)) {
+                    if (event.type == sf::Event::Closed) {
+                        mWindow.close();
+                    }
+                }
+
+                step();
+
+                // TODO: only render if shouldDraw flag is set?
+                render(mCpu.fb, mWindow);
+
+                mWindow.display();
+
+                std::this_thread::sleep_for(1s);
+            }
+
+            return 0;
+        }
+
+        void render(std::array<bool, 64 * 32>& fb, sf::RenderTarget& renderTarget) {
+            mWindow.clear(sf::Color::Black);
+
+            auto viewportSize = renderTarget.getDefaultView().getSize();
+
+            auto pixelWidth = viewportSize.x / mScalingFactor;
+            auto pixelHeight = viewportSize.y / mScalingFactor;
+            auto pixelDimensions = sf::Vector2f{pixelWidth, pixelHeight};
+
+            sf::RectangleShape rectangleShape{pixelDimensions};
+            rectangleShape.setFillColor(sf::Color::White);
+
+            for (int i = 0; i < fb.size(); i++) {
+                //rectangleShape.setPosition()
+                renderTarget.draw(rectangleShape);
+            }
+        }
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
         void dumpCore(std::ostream& outputStream) {
             mCpu.dumpState(outputStream);
         }
+#pragma clang diagnostic pop
 
     private:
         cpu_t mCpu;
+        sf::RenderWindow& mWindow;
+        int mScalingFactor;
     };
 }
 
 int main() {
-    const std::string program{"data/games/BREAKOUT"};
+    const std::string PROGRAM{"data/games/BREAKOUT"};
+
+    auto program = boost::filesystem::canonical(PROGRAM);
 
     // 64 x 32 pixel display
-    // sprites are 8 pixels wide and 1-15 pixels tall
-    //const int GRAPHICS_SCALE_FACTOR{3};
+    const int GRAPHICS_SCALE_FACTOR{2};
+
+    sf::RenderWindow window{sf::VideoMode{1024, 768}, "Chip8: " + program.string()};
 
     std::ifstream inputStream;
-    inputStream.open(program, std::ios::binary);
+    inputStream.open(program.string(), std::ios::binary);
     if (!inputStream.is_open()) {
         std::cerr << "Unable to open file: " << std::strerror(errno) << std::endl;
         return 1;
     }
 
-    chip8::Machine machine;
+    chip8::Machine machine{window, GRAPHICS_SCALE_FACTOR};
     machine.loadProgram(inputStream);
-    machine.step();
-
-    machine.dumpCore(std::cout);
-
-    return 0;
+    return machine.run();
 }
