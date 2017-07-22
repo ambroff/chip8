@@ -17,6 +17,19 @@ namespace chip8 {
 #pragma clang diagnostic pop
 
     /**
+     * 0000 Noop Instruction
+     */
+    class NoopInstruction : public Instruction {
+    public:
+        void execute(cpu_t &cpu) const override {
+        }
+
+        std::string toString() const override {
+            return "NOP";
+        }
+    };
+
+    /**
      * 0NNN	Execute machine language subroutine at address NNN
      */
     class SystemCallInstruction : public Instruction {

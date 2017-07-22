@@ -10,6 +10,10 @@ inline std::unique_ptr<Instruction> decode_opcode(uint16_t opcode)
 {
     switch (opcode & 0xF000) {
         case 0x0000:
+            if (opcode == 0x0) {
+                return std::make_unique<NoopInstruction>();
+            }
+
             // NB: SYS instruction (0x0NNN) is not implemented, since apparently nobody implements this.
             // Also security lol.
             if (opcode == 0x00E0) {

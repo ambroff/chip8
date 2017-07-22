@@ -61,6 +61,7 @@ namespace chip8 {
             }
 
             // Actually execute the instruction
+            std::cout << instruction->toString() << std::endl;
             instruction->execute(mCpu);
 
             // Each instruction is two bytes long, so we need to advance by two bytes.
@@ -85,7 +86,7 @@ namespace chip8 {
 
                 mWindow.display();
 
-                std::this_thread::sleep_for(1s);
+                std::this_thread::sleep_for(30ms);
             }
 
             return 0;
@@ -104,7 +105,16 @@ namespace chip8 {
             rectangleShape.setFillColor(sf::Color::White);
 
             for (int i = 0; i < fb.size(); i++) {
-                //rectangleShape.setPosition()
+                float x = static_cast<float>(i % 32);
+                float y = i / 64.f;
+                rectangleShape.setPosition(x, y);
+
+                if (fb[i]) {
+                    rectangleShape.setFillColor(sf::Color::White);
+                } else {
+                    rectangleShape.setFillColor(sf::Color::Black);
+                }
+
                 renderTarget.draw(rectangleShape);
             }
         }
